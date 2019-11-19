@@ -12,6 +12,12 @@
 		FC6331292382F78E00C7F7D0 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FC6331272382F78E00C7F7D0 /* Main.storyboard */; };
 		FC63312B2382F79000C7F7D0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FC63312A2382F79000C7F7D0 /* Assets.xcassets */; };
 		FC63312E2382F79000C7F7D0 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FC63312C2382F79000C7F7D0 /* LaunchScreen.storyboard */; };
+		FC633136238345FE00C7F7D0 /* Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC633135238345FE00C7F7D0 /* Types.swift */; };
+		FC6331382383498200C7F7D0 /* KernelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC6331372383498200C7F7D0 /* KernelView.swift */; };
+		FC63313A2383499800C7F7D0 /* Buffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC6331392383499800C7F7D0 /* Buffer.swift */; };
+		FC63313C23841D1100C7F7D0 /* Materials.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC63313B23841D1100C7F7D0 /* Materials.swift */; };
+		FC63313E23841D2D00C7F7D0 /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC63313D23841D2D00C7F7D0 /* Geometry.swift */; };
+		FC633140238448B100C7F7D0 /* Camera.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC63313F238448B100C7F7D0 /* Camera.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,6 +28,12 @@
 		FC63312A2382F79000C7F7D0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		FC63312D2382F79000C7F7D0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		FC63312F2382F79000C7F7D0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FC633135238345FE00C7F7D0 /* Types.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Types.swift; sourceTree = "<group>"; };
+		FC6331372383498200C7F7D0 /* KernelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KernelView.swift; sourceTree = "<group>"; };
+		FC6331392383499800C7F7D0 /* Buffer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Buffer.swift; sourceTree = "<group>"; };
+		FC63313B23841D1100C7F7D0 /* Materials.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Materials.swift; sourceTree = "<group>"; };
+		FC63313D23841D2D00C7F7D0 /* Geometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Geometry.swift; sourceTree = "<group>"; };
+		FC63313F238448B100C7F7D0 /* Camera.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Camera.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,6 +68,12 @@
 			children = (
 				FC6331232382F78E00C7F7D0 /* AppDelegate.swift */,
 				FC6331252382F78E00C7F7D0 /* ViewController.swift */,
+				FC6331372383498200C7F7D0 /* KernelView.swift */,
+				FC6331392383499800C7F7D0 /* Buffer.swift */,
+				FC63313B23841D1100C7F7D0 /* Materials.swift */,
+				FC63313D23841D2D00C7F7D0 /* Geometry.swift */,
+				FC63313F238448B100C7F7D0 /* Camera.swift */,
+				FC633135238345FE00C7F7D0 /* Types.swift */,
 				FC6331272382F78E00C7F7D0 /* Main.storyboard */,
 				FC63312A2382F79000C7F7D0 /* Assets.xcassets */,
 				FC63312C2382F79000C7F7D0 /* LaunchScreen.storyboard */,
@@ -135,8 +153,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FC633140238448B100C7F7D0 /* Camera.swift in Sources */,
+				FC63313C23841D1100C7F7D0 /* Materials.swift in Sources */,
+				FC63313E23841D2D00C7F7D0 /* Geometry.swift in Sources */,
+				FC63313A2383499800C7F7D0 /* Buffer.swift in Sources */,
 				FC6331262382F78E00C7F7D0 /* ViewController.swift in Sources */,
+				FC633136238345FE00C7F7D0 /* Types.swift in Sources */,
 				FC6331242382F78E00C7F7D0 /* AppDelegate.swift in Sources */,
+				FC6331382383498200C7F7D0 /* KernelView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -284,6 +308,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = L6J7XDHAS2;
+				GCC_OPTIMIZATION_LEVEL = fast;
 				INFOPLIST_FILE = GraphicsKernelTest/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -291,6 +316,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = co.eventcloud.GraphicsKernelTest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -302,6 +328,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = L6J7XDHAS2;
+				GCC_OPTIMIZATION_LEVEL = fast;
 				INFOPLIST_FILE = GraphicsKernelTest/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -309,6 +336,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = co.eventcloud.GraphicsKernelTest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
