@@ -17,14 +17,14 @@ struct Camera {
     let u: Vector3
     let v: Vector3
     let w: Vector3
-    let lensRadius: CGFloat
+    let lensRadius: Double
     
-    init(lookOrigin: Vector3, lookTarget: Vector3, up: Vector3, fieldOfView: CGFloat, aspect: CGFloat, aperture: CGFloat, focusDistance: CGFloat) {
-        let theta = fieldOfView * CGFloat.pi / 180
+    init(lookOrigin: Vector3, lookTarget: Vector3, up: Vector3, fieldOfView: Double, aspect: Double, aperture: Double, focusDistance: Double) {
+        let theta = fieldOfView * Double.pi / 180
         let halfHeight = tan(theta / 2)
         let halfWidth = aspect * halfHeight
-        let w = (lookOrigin - lookTarget).normal()
-        let u = Vector3.cross(up, w).normal()
+        let w = (lookOrigin - lookTarget).normalized()
+        let u = Vector3.cross(up, w).normalized()
         let v = Vector3.cross(w, u)
         let tw = halfWidth * focusDistance
         let th = halfHeight * focusDistance

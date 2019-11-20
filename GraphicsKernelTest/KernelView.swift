@@ -14,10 +14,6 @@ final class KernelView: UIView {
     
     var buffer: Buffer?
     
-    var kernels = [Kernel]()
-    
-    private var renderTimer: Timer?
-    private var isRendering = false
     private var renderQueue = DispatchQueue(
         label: "render-queue",
         qos: .userInteractive
@@ -40,7 +36,7 @@ final class KernelView: UIView {
     
     private func initialize() {
         initializeImageView()
-        initializeRenderTimer()
+//        initializeRenderTimer()
     }
     
     private func initializeImageView() {
@@ -54,61 +50,49 @@ final class KernelView: UIView {
         addSubview(imageView)
     }
     
-    private func initializeRenderTimer() {
-        guard renderTimer == nil else {
-            return
-        }
-        renderTimer = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) { [weak self] _ in
-            self?.updateDisplay()
-        }
-    }
+//    private func initializeRenderTimer() {
+//        guard renderTimer == nil else {
+//            return
+//        }
+//        renderTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+//            self?.updateDisplay()
+//        }
+//    }
     
-    func render() {
-        // TODO: Render to CGImage. Set CGImage on CALayer directly
-        guard let buffer = self.buffer else {
-            return
-        }
-        renderQueue.async { [weak self] in
-            guard let self = self else {
-                return
-            }
-            guard self.isRendering == false else {
-                return
-            }
-            self.isRendering = true
-            self.renderLine(y: 0, stride: 2, buffer: buffer)
-            self.renderLine(y: 1, stride: 2, buffer: buffer)
-        }
-    }
-    
-    private func renderLine(y: Int, stride: Int, buffer: Buffer) {
-        renderQueue.async { [weak self] in
-            guard let self = self else {
-                return
-            }
-            let size = buffer.size
-            guard y < size.y else {
-                return
-            }
+//    func render() {
+//        // TODO: Render to CGImage. Set CGImage on CALayer directly
+//        guard let buffer = self.buffer else {
+//            return
+//        }
+//        renderQueue.async { [weak self] in
+//            guard let self = self else {
+//                return
+//            }
+//            let size = buffer.size
 //            let startTime = Date()
-            for kernel in self.kernels {
-                for x in 0 ..< size.x {
-                    let coordinate = IntegralCoordinate(
-                        x: x,
-                        y: y
-                    )
-                    let color = kernel(coordinate)
-                    buffer.set(color: color, at: coordinate)
-                }
-            }
+//            for kernel in self.kernels {
+//                for y in 0 ..< size.y {
+//                    for x in 0 ..< size.x {
+//                        let coordinate = IntegralCoordinate(
+//                            x: x,
+//                            y: y
+//                        )
+//                        let color = kernel(coordinate)
+//                        buffer.set(color: color, at: coordinate)
+//                    }
+//                }
+//            }
 //            let endTime = Date()
 //            let elapsedTime = endTime.timeIntervalSince(startTime)
-//            print("Line #\(y) render time = \(elapsedTime) seconds")
-            self.renderLine(y: y + stride, stride: stride, buffer: buffer)
-        }
-    }
+//            print("Render time = \(elapsedTime) seconds")
+////            self.renderLine(y: y + stride, stride: stride, buffer: buffer)
+//            DispatchQueue.main.async {
+//                self.updateDisplay()
+//            }
+//        }
+//    }
     
-    private func updateDisplay() {
+    func updateDisplay() {
         renderQueue.async { [weak self] in
             guard let self = self else {
                 return

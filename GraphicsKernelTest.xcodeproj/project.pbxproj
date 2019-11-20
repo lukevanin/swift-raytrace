@@ -18,6 +18,8 @@
 		FC63313C23841D1100C7F7D0 /* Materials.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC63313B23841D1100C7F7D0 /* Materials.swift */; };
 		FC63313E23841D2D00C7F7D0 /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC63313D23841D2D00C7F7D0 /* Geometry.swift */; };
 		FC633140238448B100C7F7D0 /* Camera.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC63313F238448B100C7F7D0 /* Camera.swift */; };
+		FC6331422385405D00C7F7D0 /* Math.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC6331412385405D00C7F7D0 /* Math.swift */; };
+		FC63314423854D7200C7F7D0 /* Raytracer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC63314323854D7200C7F7D0 /* Raytracer.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +36,8 @@
 		FC63313B23841D1100C7F7D0 /* Materials.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Materials.swift; sourceTree = "<group>"; };
 		FC63313D23841D2D00C7F7D0 /* Geometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Geometry.swift; sourceTree = "<group>"; };
 		FC63313F238448B100C7F7D0 /* Camera.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Camera.swift; sourceTree = "<group>"; };
+		FC6331412385405D00C7F7D0 /* Math.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Math.swift; sourceTree = "<group>"; };
+		FC63314323854D7200C7F7D0 /* Raytracer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Raytracer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -68,12 +72,14 @@
 			children = (
 				FC6331232382F78E00C7F7D0 /* AppDelegate.swift */,
 				FC6331252382F78E00C7F7D0 /* ViewController.swift */,
+				FC63314323854D7200C7F7D0 /* Raytracer.swift */,
 				FC6331372383498200C7F7D0 /* KernelView.swift */,
 				FC6331392383499800C7F7D0 /* Buffer.swift */,
 				FC63313B23841D1100C7F7D0 /* Materials.swift */,
 				FC63313D23841D2D00C7F7D0 /* Geometry.swift */,
 				FC63313F238448B100C7F7D0 /* Camera.swift */,
 				FC633135238345FE00C7F7D0 /* Types.swift */,
+				FC6331412385405D00C7F7D0 /* Math.swift */,
 				FC6331272382F78E00C7F7D0 /* Main.storyboard */,
 				FC63312A2382F79000C7F7D0 /* Assets.xcassets */,
 				FC63312C2382F79000C7F7D0 /* LaunchScreen.storyboard */,
@@ -155,8 +161,10 @@
 			files = (
 				FC633140238448B100C7F7D0 /* Camera.swift in Sources */,
 				FC63313C23841D1100C7F7D0 /* Materials.swift in Sources */,
+				FC6331422385405D00C7F7D0 /* Math.swift in Sources */,
 				FC63313E23841D2D00C7F7D0 /* Geometry.swift in Sources */,
 				FC63313A2383499800C7F7D0 /* Buffer.swift in Sources */,
+				FC63314423854D7200C7F7D0 /* Raytracer.swift in Sources */,
 				FC6331262382F78E00C7F7D0 /* ViewController.swift in Sources */,
 				FC633136238345FE00C7F7D0 /* Types.swift in Sources */,
 				FC6331242382F78E00C7F7D0 /* AppDelegate.swift in Sources */,
@@ -316,7 +324,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = co.eventcloud.GraphicsKernelTest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

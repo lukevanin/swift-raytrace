@@ -12,7 +12,7 @@ import CoreGraphics
 struct LambertianMaterial: Material {
     let albedo: Vector3
     func scatter(ray: Ray, hit: Hit) -> MaterialRay? {
-        let target = hit.coordinate + hit.normal + Vector3.random().normal()
+        let target = hit.coordinate + hit.normal + Vector3.random().normalized()
         return MaterialRay(
             attenuation: albedo,
             ray: Ray(
@@ -25,11 +25,11 @@ struct LambertianMaterial: Material {
 
 struct MetalMaterial: Material {
     let albedo: Vector3
-    let fuzz: CGFloat
+    let fuzz: Double
     
     func scatter(ray: Ray, hit: Hit) -> MaterialRay? {
         let reflected = Vector3.reflect(ray.direction, hit.normal)
-        let direction = reflected + (Vector3.random().normal() * fuzz)
+        let direction = reflected + (Vector3.random().normalized() * fuzz)
         guard Vector3.dot(direction, hit.normal) > 0 else {
             // Ray not reflected
             return nil
@@ -45,15 +45,14 @@ struct MetalMaterial: Material {
 }
 
 struct DielectricMaterial: Material {
-    let refractiveIndex: CGFloat
+    let refractiveIndex: Double
     
     func scatter(ray: Ray, hit: Hit) -> MaterialRay? {
         let reflected = Vector3.reflect(ray.direction, hit.normal)
-        let attenuation = Vector3(x: 1.0, y: 1.0, z: 1.0)
         let dotProduct = Vector3.dot(ray.direction, hit.normal)
         let outwardNormal: Vector3
-        let refractiveIndex: CGFloat
-        let cosine: CGFloat
+        let refractiveIndex: Double
+        let cosine: Double
         
         if dotProduct > 0 {
             outwardNormal = -hit.normal
@@ -66,30 +65,28 @@ struct DielectricMaterial: Material {
             cosine = -dotProduct / ray.direction.length()
         }
         
+        let direction: Vector3
         if let refracted = Vector3.refract(ray.direction, outwardNormal, refractiveIndex) {
-            let p = schlick(cosine: cosine, refractiveIndex: refractiveIndex)
-            if CGFloat.random(in: 0 ..< 1.0) >= p {
-                return MaterialRay(
-                    attenuation: attenuation,
-                    ray: Ray(origin: hit.coordinate, direction: refracted)
-                )
+            let reflectionProbability = schlick(cosine: cosine, refractiveIndex: refractiveIndex)
+            let r = Random(range: Range(min: 0, max: 1.0))
+            if r.next() < reflectionProbability {
+                direction = reflected
             }
             else {
-                return MaterialRay(
-                    attenuation: attenuation,
-                    ray: Ray(origin: hit.coordinate, direction: reflected)
-                )
+                direction = refracted
             }
         }
         else {
-            return MaterialRay(
-                attenuation: attenuation,
-                ray: Ray(origin: hit.coordinate, direction: reflected)
-            )
+            direction = reflected
         }
+        
+        return MaterialRay(
+            attenuation: Vector3(x: 1.0, y: 1.0, z: 1.0),
+            ray: Ray(origin: hit.coordinate, direction: direction)
+        )
     }
     
-    private func schlick(cosine: CGFloat, refractiveIndex: CGFloat) -> CGFloat {
+    private func schlick(cosine: Double, refractiveIndex: Double) -> Double {
         let r0 = (1 - refractiveIndex) / (1 + refractiveIndex)
         let r1 = r0 * r0
         return r1 + ((1 - r1) * pow(1 - cosine, 5))

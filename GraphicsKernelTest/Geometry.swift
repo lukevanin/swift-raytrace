@@ -11,7 +11,7 @@ import CoreGraphics
 
 struct Sphere: Hitable {
     let origin: Vector3
-    let radius: CGFloat
+    let radius: Double
     let material: Material
     
     func hit(ray: Ray, limits: Range) -> Hit? {

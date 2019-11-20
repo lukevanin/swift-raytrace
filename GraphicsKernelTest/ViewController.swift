@@ -9,13 +9,13 @@
 import UIKit
 
 private func testPatternKernel(renderSize: IntegralCoordinate) -> Kernel {
-    let w = CGFloat(renderSize.x)
-    let h = CGFloat(renderSize.y)
+    let w = Double(renderSize.x)
+    let h = Double(renderSize.y)
     return { coordinate in
         let x = coordinate.x
         let y = coordinate.y
-        let u = CGFloat(x)
-        let v = CGFloat(y)
+        let u = Double(x)
+        let v = Double(y)
         
         let a = x % 10 >= 5
         let b = y % 10 >= 5
@@ -30,29 +30,15 @@ private func testPatternKernel(renderSize: IntegralCoordinate) -> Kernel {
 }
 
 private func sky(ray: Ray) -> Color {
-    let unitDirection = ray.direction.normal()
+    let unitDirection = ray.direction.normalized()
     let t = 0.5 * (unitDirection.y + 1)
     let startColor = Vector3(x: 1, y: 1, z: 1)
     let endColor = Vector3(x: 0.5, y: 0.7, z: 1.0)
     return Vector3.lerp(from: startColor, to: endColor, t: 1.0 - t)
 }
 
-private func color(ray: Ray, world: Hitable, depth: Int) -> Color {
-    let limits = Range(min: 0.001, max: CGFloat.greatestFiniteMagnitude)
-    if let hit = world.hit(ray: ray, limits: limits) {
-        if let scatter = hit.material.scatter(ray: ray, hit: hit), depth > 0 {
-            return color(ray: scatter.ray, world: world, depth: depth - 1) * scatter.attenuation
-        }
-        else {
-            return Vector3.zero
-        }
-    }
-    else {
-        return sky(ray: ray)
-    }
-}
 
-private func makeRandomWorld() -> HitableList {
+private func makeRandomWorld() -> Hitable {
     
     var items = [Hitable]()
     
@@ -72,9 +58,8 @@ private func makeRandomWorld() -> HitableList {
         Sphere(
             origin: Vector3(x: 4, y: -1, z: 0),
             radius: 1.0,
-            material: MetalMaterial(
-                albedo: Vector3(r: 0.8, g: 0.6, b: 0.5),
-                fuzz: 0
+            material: DielectricMaterial(
+                refractiveIndex: 1.5
             )
         )
     )
@@ -93,44 +78,45 @@ private func makeRandomWorld() -> HitableList {
         Sphere(
             origin: Vector3(x: 0, y: -1, z: 0),
             radius: 1.0,
-            material: DielectricMaterial(
-                refractiveIndex: 1.5
+            material: MetalMaterial(
+                albedo: Vector3(r: 0.8, g: 0.6, b: 0.5),
+                fuzz: 0
             )
         )
     )
     
     // Small spheres
-    let offsetRange = CGFloat(-0.5) ..< CGFloat(0.5)
-    let colorRange = CGFloat(0.2) ..< CGFloat(0.8)
+    let offsetRange = Double(-0.5) ..< Double(0.5)
+    let colorRange = Double(0.2) ..< Double(0.8)
     let anchor = Vector3(x: 4, y: -0.2, z: 0)
     
     for y in -3 ..< 3 {
         for x in -8 ..< 8 {
             let center = Vector3(
-                x: CGFloat(x) + (CGFloat.random(in: offsetRange) * 0.9),
+                x: Double(x) + (Double.random(in: offsetRange) * 0.9),
                 y: -0.2,
-                z: CGFloat(y) + (CGFloat.random(in: offsetRange) * 0.9)
+                z: Double(y) + (Double.random(in: offsetRange) * 0.9)
             )
             
             if (center - anchor).length() > 0.9 {
                 let material: Material
-                let m = CGFloat.random(in: 0 ..< 1)
+                let m = Double.random(in: 0 ..< 1)
                 
                 if m > 0.2 {
                     material = LambertianMaterial(
                         albedo: Vector3(
-                            r: CGFloat.random(in: colorRange),
-                            g: CGFloat.random(in: colorRange),
-                            b: CGFloat.random(in: colorRange)
+                            r: Double.random(in: colorRange),
+                            g: Double.random(in: colorRange),
+                            b: Double.random(in: colorRange)
                         )
                     )
                 }
                 else if m > 0.1 {
                     material = MetalMaterial(
                         albedo: Vector3(
-                            r: CGFloat.random(in: colorRange),
-                            g: CGFloat.random(in: colorRange),
-                            b: CGFloat.random(in: colorRange)
+                            r: Double.random(in: colorRange),
+                            g: Double.random(in: colorRange),
+                            b: Double.random(in: colorRange)
                         ),
                         fuzz: 0
                     )
@@ -156,127 +142,154 @@ private func makeRandomWorld() -> HitableList {
     return HitableList(items: items)
 }
 
-private func raytraceKernel(renderSize: IntegralCoordinate) -> Kernel {
-    
-//    let camera = Camera(
-//        origin: Vector3(x: 0, y: 0, z: 0),
-//        corner: Vector3(x: -1, y: -1, z: -1),
-//        horizontal: Vector3(x: 2, y: 0, z: 0),
-//        vertical: Vector3(x: 0, y: 2, z: 0)
-//    )
-    
-    let lookOrigin = Vector3(x: 18, y: -3.0, z: 4)
-    let lookTarget = Vector3(x: 0, y: 0, z: -1)
-    let focusDistance = (lookOrigin - lookTarget).length()
-    let aperture = CGFloat(0.1)
-    
-    let camera = Camera(
-        lookOrigin: lookOrigin,
-        lookTarget: lookTarget,
-        up: Vector3(x: 0, y: 1, z: 0),
-        fieldOfView: 10,
-        aspect: CGFloat(renderSize.x) / CGFloat(renderSize.y),
-        aperture: aperture,
-        focusDistance: focusDistance
-    )
-    
-    let world = makeRandomWorld()
-    
-//    let world = HitableList(items: [
-//        // Ground
-//        Sphere(
-//            origin: Vector3(x: 0, y: 100.5, z: -1),
-//            radius: 100,
-//            material: LambertianMaterial(
-//                albedo: Vector3(r: 0.8, g: 0.8, b: 0.8)
-//            )
-//        ),
-////        // Middle
-////        Sphere(
-////            origin: Vector3(x: 0, y: 0, z: -1),
-////            radius: 0.5,
-////            material: LambertianMaterial(
-////                albedo: Vector3(r: 0.1, g: 0.2, b: 0.5)
-////            )
-////        ),
-////        // Right
-////        Sphere(
-////            origin: Vector3(x: 1, y: 0, z: -1),
-////            radius: 0.5,
-////            material: MetalMaterial(
-////                albedo: Vector3(r: 0.8, g: 0.6, b: 0.2),
-////                fuzz: 0.3
-////            )
-////        ),
-////        // Left
-////        Sphere(
-////            origin: Vector3(x: -1, y: 0, z: -1),
-////            radius: 0.5,
-////            material: DielectricMaterial(
-////                refactiveIndex: 1.5
-////            )
-////        ),
-////        // Middle
-////        Sphere(
-////            origin: Vector3(x: 0.51, y: 0, z: -1),
-////            radius: 0.5,
-////            material: MetalMaterial(
-////                albedo: Vector3(r: 0.9, g: 0.9, b: 0.9),
-////                fuzz: 0.1
-////            )
-////        ),
-////        // Left
-////        Sphere(
-////            origin: Vector3(x: -0.51, y: 0, z: -1),
-////            radius: 0.5,
-////            material: DielectricMaterial(
-////                refractiveIndex: 1.1
-////            )
-////        ),
-//        // Right
-//        Sphere(
-//            origin: Vector3(x: 1, y: 0, z: -1),
-//            radius: 0.5,
-//            material: LambertianMaterial(
-//                albedo: Vector3(r: 0.8, g: 0.8, b: 0.1)
-//            )
-//        ),
-//        // Middle
-//        Sphere(
-//            origin: Vector3(x: 0, y: 0, z: -1),
-//            radius: 0.5,
-//            material: MetalMaterial(
-//                albedo: Vector3(r: 0.9, g: 0.1, b: 0.1),
-//                fuzz: 0.1
-//            )
-//        ),
-//        // Left
-//        Sphere(
-//            origin: Vector3(x: -1, y: 0, z: -1),
-//            radius: 0.5,
-//            material: LambertianMaterial(
-//                albedo: Vector3(r: 0.1, g: 0.1, b: 0.8)
-//            )
-//        ),
-//    ])
-    
-    let sampleCount = 100
-    let sampleRange = CGFloat(-0.5) ..< CGFloat(0.5)
-    let sampleDepth = 50
-    
-    return { coordinate in
-        var a = Vector3.zero
-        for _ in 0 ..< sampleCount {
-            let p = CGFloat.random(in: sampleRange)
-            let q = CGFloat.random(in: sampleRange)
-            let u = (CGFloat(coordinate.x) + p) / CGFloat(renderSize.x)
-            let v = (CGFloat(coordinate.y) + q) / CGFloat(renderSize.y)
-            let r = camera.ray(coordinate: Coordinate(x: u, y: v))
-            let c = color(ray: r, world: world, depth: sampleDepth)
-            a = a + c
-        }
-        return a / CGFloat(sampleCount)
-    }
+private func makeTestWorld5() -> Hitable {
+    let items = [
+        // Ground
+        Sphere(
+            origin: Vector3(x: 0, y: 100.5, z: -1),
+            radius: 100,
+            material: LambertianMaterial(
+                albedo: Vector3(r: 0.8, g: 0.8, b: 0.8)
+            )
+        ),
+        Sphere(
+            origin: Vector3(x: 1, y: 0, z: -1),
+            radius: 0.5,
+            material: LambertianMaterial(
+                albedo: Vector3(r: 0.8, g: 0.8, b: 0.1)
+            )
+        ),
+        Sphere(
+            origin: Vector3(x: 0, y: 0, z: -1),
+            radius: 0.5,
+            material: MetalMaterial(
+                albedo: Vector3(r: 0.9, g: 0.1, b: 0.1),
+                fuzz: 0.1
+            )
+        ),
+        Sphere(
+            origin: Vector3(x: -1, y: 0, z: -1),
+            radius: 0.5,
+            material: LambertianMaterial(
+                albedo: Vector3(r: 0.1, g: 0.1, b: 0.8)
+            )
+        ),
+    ]
+    return HitableList(items: items)
+}
+
+private func makeTestWorld4() -> Hitable {
+    let items = [
+        // Ground
+        Sphere(
+            origin: Vector3(x: 0, y: 100.5, z: -1),
+            radius: 100,
+            material: LambertianMaterial(
+                albedo: Vector3(r: 0.8, g: 0.8, b: 0.8)
+            )
+        ),
+        Sphere(
+            origin: Vector3(x: 0.51, y: 0, z: -1),
+            radius: 0.5,
+            material: MetalMaterial(
+                albedo: Vector3(r: 0.9, g: 0.1, b: 0.1),
+                fuzz: 0.1
+            )
+        ),
+        Sphere(
+            origin: Vector3(x: -0.51, y: 0, z: -1),
+            radius: 0.5,
+            material: DielectricMaterial(
+                refractiveIndex: 1.5
+            )
+        ),
+    ]
+    return HitableList(items: items)
+}
+
+private func makeTestWorld3() -> Hitable {
+    let items = [
+        // Ground
+        Sphere(
+            origin: Vector3(x: 0, y: 100.5, z: -1),
+            radius: 100,
+            material: LambertianMaterial(
+                albedo: Vector3(r: 0.8, g: 0.8, b: 0.0)
+            )
+        ),
+        Sphere(
+            origin: Vector3(x: 0.51, y: 0, z: -1),
+            radius: 0.5,
+            material: DielectricMaterial(
+                refractiveIndex: 1.5
+            )
+        ),
+        Sphere(
+            origin: Vector3(x: -0.51, y: 0, z: -1),
+            radius: 0.5,
+            material: LambertianMaterial(
+                albedo: Vector3(r: 0.8, g: 0.8, b: 0.8)
+            )
+        ),
+    ]
+    return HitableList(items: items)
+}
+
+private func makeTestWorld2() -> Hitable {
+    let items = [
+        // Ground
+        Sphere(
+            origin: Vector3(x: 0, y: 100.5, z: -1),
+            radius: 100,
+            material: LambertianMaterial(
+                albedo: Vector3(r: 0.8, g: 0.8, b: 0)
+            )
+        ),
+        Sphere(
+            origin: Vector3(x: 0.51, y: 0, z: -1),
+            radius: 0.5,
+            material: LambertianMaterial(
+                albedo: Vector3(r: 0.1, g: 0.2, b: 0.5)
+            )
+        ),
+        Sphere(
+            origin: Vector3(x: -0.51, y: 0, z: -1),
+            radius: 0.5,
+            material: MetalMaterial(
+                albedo: Vector3(r: 0.8, g: 0.6, b: 0.2),
+                fuzz: 0.5
+            )
+        ),
+    ]
+    return HitableList(items: items)
+}
+
+private func makeTestWorld1() -> Hitable {
+    let items = [
+        // Ground
+        Sphere(
+            origin: Vector3(x: 0, y: 100.5, z: -1),
+            radius: 100,
+            material: LambertianMaterial(
+                albedo: Vector3(r: 0.8, g: 0.8, b: 0.8)
+            )
+        ),
+        Sphere(
+            origin: Vector3(x: 0.51, y: 0, z: -1),
+            radius: 0.5,
+            material: LambertianMaterial(
+                albedo: Vector3(r: 0.1, g: 0.1, b: 0.8)
+            )
+        ),
+        Sphere(
+            origin: Vector3(x: -0.51, y: 0, z: -1),
+            radius: 0.5,
+            material: LambertianMaterial(
+                albedo: Vector3(r: 0.8, g: 0.1, b: 0.1)
+            )
+        ),
+    ]
+    return HitableList(items: items)
 }
 
 class ViewController: UIViewController {
@@ -284,6 +297,8 @@ class ViewController: UIViewController {
     var kernelView: KernelView? {
         return self.view as? KernelView
     }
+    
+    private let renderQueue = DispatchQueue(label: "render-queue")
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -296,11 +311,40 @@ class ViewController: UIViewController {
         let renderSize = IntegralCoordinate(x: 200, y: 200)
         let imageBuffer = Buffer(size: renderSize)
         
-        //        kernelView?.kernels.append(testPatternKernel(renderSize: renderSize))
-        kernelView?.kernels.append(raytraceKernel(renderSize: renderSize))
+//        let lookOrigin = Vector3(x: 0, y: -0.5, z: 2)
+        let lookOrigin = Vector3(x: -3, y: -0.5, z: 2)
+        let lookTarget = Vector3(x: 0, y: 0, z: -1)
+        let focusDistance = (lookOrigin - lookTarget).length()
+        let aperture = Double(0.1)
+        
+        let camera = Camera(
+            lookOrigin: lookOrigin,
+            lookTarget: lookTarget,
+            up: Vector3(x: 0, y: 1, z: 0),
+            fieldOfView: 30,
+            aspect: Double(renderSize.x) / Double(renderSize.y),
+            aperture: aperture,
+            focusDistance: focusDistance
+        )
+        
+        //    let world = makeRandomWorld()
+        let world = makeTestWorld4()
+
+        let renderer = Raytracer(
+            camera: camera,
+            world: world,
+            background: sky,
+            buffer: imageBuffer,
+            config: Raytracer.Config(
+                sampleCount: 500,
+                sampleDepth: 50
+            )
+        )
 
         kernelView?.buffer = imageBuffer
-        kernelView?.render()
+
+        renderer.render()
+        kernelView?.updateDisplay()
     }
 }
 
