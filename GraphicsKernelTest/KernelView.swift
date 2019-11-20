@@ -12,13 +12,15 @@ typealias Kernel = (IntegralCoordinate) -> Color
 
 final class KernelView: UIView {
     
-    var buffer: Buffer?
+    var image: UIImage? {
+        get {
+            return imageView.image
+        }
+        set {
+            imageView.image = newValue
+        }
+    }
     
-    private var renderQueue = DispatchQueue(
-        label: "render-queue",
-        qos: .userInteractive
-    )
-
     private let imageView: UIImageView = {
         let imageView = UIImageView()
         return imageView
@@ -91,19 +93,4 @@ final class KernelView: UIView {
 //            }
 //        }
 //    }
-    
-    func updateDisplay() {
-        renderQueue.async { [weak self] in
-            guard let self = self else {
-                return
-            }
-            guard let cgImage = self.buffer?.cgImage() else {
-                return
-            }
-            let image = UIImage(cgImage: cgImage)
-            DispatchQueue.main.async {
-                self.imageView.image = image
-            }
-        }
-    }
 }

@@ -184,13 +184,14 @@ private func makeTestWorld4() -> Hitable {
         Sphere(
             origin: Vector3(x: 0, y: 100.5, z: -1),
             radius: 100,
-            material: LambertianMaterial(
-                albedo: Vector3(r: 0.8, g: 0.8, b: 0.8)
+            material: MetalMaterial(
+                albedo: Vector3(r: 0.66, g: 0.66, b: 0.66),
+                fuzz: 0.5
             )
         ),
         Sphere(
-            origin: Vector3(x: 0.51, y: 0, z: -1),
-            radius: 0.5,
+            origin: Vector3(x: 0.51, y: 0.1, z: -1),
+            radius: 0.4,
             material: MetalMaterial(
                 albedo: Vector3(r: 0.9, g: 0.1, b: 0.1),
                 fuzz: 0.1
@@ -308,8 +309,10 @@ class ViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
-        let renderSize = IntegralCoordinate(x: 200, y: 200)
-        let imageBuffer = Buffer(size: renderSize)
+        let viewportSize = IntegralCoordinate(
+            x: 32 * 10,
+            y: 32 * 10
+        )
         
 //        let lookOrigin = Vector3(x: 0, y: -0.5, z: 2)
         let lookOrigin = Vector3(x: -3, y: -0.5, z: 2)
@@ -322,7 +325,7 @@ class ViewController: UIViewController {
             lookTarget: lookTarget,
             up: Vector3(x: 0, y: 1, z: 0),
             fieldOfView: 30,
-            aspect: Double(renderSize.x) / Double(renderSize.y),
+            aspect: Double(viewportSize.x) / Double(viewportSize.y),
             aperture: aperture,
             focusDistance: focusDistance
         )
@@ -331,20 +334,19 @@ class ViewController: UIViewController {
         let world = makeTestWorld4()
 
         let renderer = Raytracer(
+            viewportSize: viewportSize,
             camera: camera,
             world: world,
             background: sky,
-            buffer: imageBuffer,
             config: Raytracer.Config(
                 sampleCount: 500,
-                sampleDepth: 50
+                sampleDepth: 20
             )
         )
 
-        kernelView?.buffer = imageBuffer
-
-        renderer.render()
-        kernelView?.updateDisplay()
+        renderer.render() { image in
+            self.kernelView?.image = image
+        }
     }
 }
 

@@ -36,9 +36,9 @@ final class Buffer {
     
     func set(color: Color, at coordinate: IntegralCoordinate) {
         let d = (coordinate.y * bytesPerRow) + (coordinate.x * bytesPerPixel)
-        data[d + 1] = UInt8((color.r * 255.99))
-        data[d + 2] = UInt8((color.g * 255.99))
-        data[d + 3] = UInt8((color.b * 255.99))
+        data[d + 1] = UInt8(color.r * 255.99)
+        data[d + 2] = UInt8(color.g * 255.99)
+        data[d + 3] = UInt8(color.b * 255.99)
     }
     
     func cgImage() -> CGImage? {
